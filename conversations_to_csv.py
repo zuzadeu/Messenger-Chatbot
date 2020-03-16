@@ -30,7 +30,7 @@ import collections
 #            string = item.find_all("div") 
 #            print(string)
 
-contents = open("MyFriend_YJX3MkSiqQ/message_2.html", encoding="utf-8").read()
+contents = open("MyFriend_YJX3MkSiqQ/message_1.html", encoding="utf-8").read()
 soup = BeautifulSoup(contents, 'lxml')
 lists = soup.select(".pam._3-95._2pi0._2lej.uiBoxWhite.noborder")
 for lis in lists: 
