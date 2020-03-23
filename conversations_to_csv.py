@@ -68,3 +68,11 @@ num_entry_lines = sum(1 for line in open('input_text.txt', encoding="utf-8"))
 print(num_entry_lines)
 num_output_lines = sum(1 for line in open('output_text.txt', encoding="utf-8"))
 print(num_output_lines)
+
+
+
+import pandas as pd
+df_input = pd.read_csv('input_text.txt',  sep="\t", names = ['input'])
+df_target = pd.read_csv('output_text.txt',  sep="\t", names = ['target'])
+df = pd.concat([df_input, df_target], axis=1, sort=False)
+df.to_csv('conversations.csv')
