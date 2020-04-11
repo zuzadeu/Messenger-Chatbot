@@ -19,12 +19,15 @@ import numpy as np
 import pandas as pd
 from time import time
 import matplotlib.pyplot as plt
+import pickle
 
 # Maximum sentence length
 MAX_LENGTH = 30
 
 tf.random.set_seed(1234)
 AUTO = tf.data.experimental.AUTOTUNE
+
+
 
 def textPreprocess(input_text):
 
@@ -43,7 +46,18 @@ def textPreprocess(input_text):
 
   return removeTriplicated(removeSpecial(removeAccents(input_text.lower())))
 
-# Tokenize, filter and pad sentences
+
+
+# Build tokenizer using tfds for both questions and answers
+def buildTokenizer(questions, answers):
+    tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(
+    questions + answers, target_vocab_size=2**13)
+    with open('tokenizer.pickle', 'wb') as handle:
+        pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    return tokenizer
+    
+    
+# Tokenize, filter pad sentences
 def tokenize_and_filter(inputs, outputs):
   tokenized_inputs, tokenized_outputs = [], []
   
@@ -357,6 +371,8 @@ def accuracy(y_true, y_pred):
   y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
   return tf.keras.metrics.sparse_categorical_accuracy(y_true, y_pred)
 
+
+
 class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
 
   def __init__(self, d_model, warmup_steps=4000):
@@ -372,3 +388,21 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
     arg2 = step * (self.warmup_steps**-1.5)
 
     return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
+
+
+
+
+
+
+def main():
+    print("Text preprocessing")
+    df = pd.read_csv('conversations_2.csv')
+    df['Input (Zuzanna Deutschman)'] = df['Input (Zuzanna Deutschman)'].apply(lambda x: textPreprocess(str(x)))
+    df['Target (Sebastian Frysztak)'] = df['Target (Sebastian Frysztak)'].apply(lambda x: textPreprocess(str(x)))
+    questions, answers = df['Input (Zuzanna Deutschman)'].tolist(), df['Target (Sebastian Frysztak)'].tolist()
+    
+    print("Build tokenizer")
+    tokenizer = buildTokenizer(questions, answers)
+
+if __name__ == '__main__':
+    main()
