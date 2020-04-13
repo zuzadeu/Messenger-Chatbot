@@ -1,78 +1,108 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Mar 15 10:45:26 2020
-
-@author: zuzan
-"""
-
-from bs4 import BeautifulSoup 
-import requests 
-import pandas as pd
-from pandas.compat import StringIO
-import matplotlib.pyplot as plt
-import numpy as np
-import itertools
-import networkx as nx
-import collections
+import argparse
+from pathlib import Path
 import re
-
-    
-def selectFileToSave(name):
-    if re.match('Zuzanna', name):
-        file = 'input_text.txt'
-    else:
-        file = 'output_text.txt'
-    return file
-
-
-def input_and_output(line_number):
-    input_txt = open('input_text.txt', encoding="utf-8")
-    all_inputs = input_txt.readlines()
-    #print(f"{all_inputs[line_number]}")
-    output_txt = open('output_text.txt', encoding="utf-8")
-    all_outputs = output_txt.readlines()
-    #print(f"{all_outputs[line_number]}")
-    return all_inputs[line_number], all_outputs[line_number]
-
-#with open('input_text.txt', 'a') as input_text, open('output_text.txt', 'a') as output_text:
-    
-for file_number in range (19, 0, -1):
-    contents = open(f"MyFriend_YJX3MkSiqQ/message_{file_number}.html", encoding="utf-8").read()
-    soup = BeautifulSoup(contents, 'lxml')
-    lists = soup.select(".pam._3-95._2pi0._2lej.uiBoxWhite.noborder")
-    temp_name = lists[0].select("._3-96._2pio._2lek._2lel")[0].getText()
-    file = selectFileToSave(temp_name)
-    print(temp_name)
-    for lis in reversed(lists): 
-        name = lis.select("._3-96._2pio._2lek._2lel")[0].getText() 
-        entries = lis.find_all("div", {"class": "_3-96 _2let"}) 
-        
-        for entry in entries: 
-            texts = entry.find_all("div")
-            for item in texts: 
-                string = item.find("div", text=True)#.getText()
-                if string != None:
-                    string = string.getText()
-                    if not re.match("http.*", string):
-                        with open(file, 'a', encoding = "utf-8", newline='') as f:
-                            if name != temp_name:
-                                f.write('\n')
-                                file = selectFileToSave(name)
-                                temp_name = name
-                            print(string)
-                            f.write(string.strip("\n") + ' ')
-                            
-
-                            
-num_entry_lines = sum(1 for line in open('input_text.txt', encoding="utf-8"))
-print(num_entry_lines)
-num_output_lines = sum(1 for line in open('output_text.txt', encoding="utf-8"))
-print(num_output_lines)
+from bs4 import BeautifulSoup
+from functools import reduce
+import csv
+from tqdm import tqdm
 
 
 
-import pandas as pd
-df_input = pd.read_csv('input_text.txt',  sep="\t", names = ['input'])
-df_target = pd.read_csv('output_text.txt',  sep="\t", names = ['target'])
-df = pd.concat([df_input, df_target], axis=1, sort=False)
-df.to_csv('conversations.csv')
+
+def messageFileKey(file):
+    match = re.search(r'message_(\d+).html', str(file))
+    return int(match.group(1))
+
+
+
+
+def parseMessage(block):
+    children = block.div.find_all(recursive=False)
+    message = children[1].find(text=True, recursive=False)
+    if message != None:
+        message = ' '.join(message.split())
+    return message
+
+
+
+
+def parseMessageBlock(block):
+    author = block.select('div._3-96._2pio._2lek._2lel')[0].getText()
+    message = parseMessage(block.select('div._3-96._2let')[0])
+    return (author, message)
+
+
+
+
+def parseFile(file):
+    with open(file, 'r', encoding='utf-8') as f:
+        soup = BeautifulSoup(f.read(), 'lxml')
+        blocks = soup.select('html body._5vb_._2yq._4yic div.clearfix._ikh div._4bl9 div._li div._3a_u div._4t5n div.pam._3-95._2pi0._2lej.uiBoxWhite.noborder')
+        messages = []
+        for block in blocks[::-1]:
+            messages.append(parseMessageBlock(block))
+        return messages
+
+
+
+
+def filterMessages(messages):
+    return filter(lambda message: message[1] != None, messages)
+
+
+
+
+def mergeMessages(messages):
+    def reducer(acc, message):
+        if len(acc) == 0:
+            return [message]
+
+        (lastAuthor, lastMessage) = acc[-1]
+        (currentAuthor, currentMessage) = message
+        if lastAuthor != currentAuthor:
+            return acc + [message]
+        else:
+            newMessage = ' '.join([lastMessage, currentMessage])
+            return acc[:-1] + [(currentAuthor, newMessage)]
+
+    return reduce(reducer, messages, [])
+
+
+
+
+def saveMessages(messages):
+    with open('conversations.csv', 'w', encoding='utf-8') as f:
+        writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+        writer.writerow([f'Input', f'Target'])
+        for msg1, msg2 in zip(messages[::2], messages[1::2]):
+            author1, message1 = msg1
+            author2, message2 = msg2
+
+            if author1 == INPUT:
+                writer.writerow([message1, message2])
+            else:
+                writer.writerow([message2, message1])
+
+
+
+
+INPUT = input("Please enter input person fullname: ")
+TARGET = input("Please enter target person fullname (for chatbot): ")
+
+argparser = argparse.ArgumentParser(description='Converts Facebook messages to CSV')
+argparser.add_argument('Path', metavar='path', type=str, help='Message path') 
+args = argparser.parse_args()
+
+print("Find messenger files...")
+messagePath = args.Path
+messageFiles = Path(messagePath).rglob('message*.html')
+messageFiles = sorted(messageFiles, key=messageFileKey, reverse=True)
+print("Parse files...")
+messages = []
+for messageFile in tqdm(messageFiles):
+    messages = messages + parseFile(messageFile)
+print("Filter and merge files...")
+messages = filterMessages(messages)
+messages = mergeMessages(messages)
+saveMessages(messages)
+print("Conversations saved!")
