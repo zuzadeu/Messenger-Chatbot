@@ -14,6 +14,8 @@ The project is compatibile with Python 3.4+ and Tensorflow 2.
 
 ## Demo
 
+![](C:\Users\zuzan\Pictures\chatbot.gif)
+
 ## TODO
 
 * Firstly, please download messenger conversation with any friend you want. [Here ]([https://www.zapptales.com/en/download-facebook-messenger-chat-history-how-to/](https://www.zapptales.com/en/download-facebook-messenger-chat-history-how-to/) you can find description how to do it. As a result you should have one or multiple files called `message_{n}.html` in certain folder.
@@ -50,6 +52,6 @@ The project is compatibile with Python 3.4+ and Tensorflow 2.
   
   * 
 
-* I hope you like chatbot you built. If you are interested in details of how it works, please go to  the `transformer_chatbot.ipynb` notebook.
-
+* I hope you like chatbot you built. If you are interested in details of how it works, please go to  the `transformer_chatbot.ipynb` notebook and to my [Medium artcile]([https://medium.com/@zuzannadeutschman/replicate-your-friend-with-transformer-bc5efe3a1596](https://medium.com/@zuzannadeutschman/replicate-your-friend-with-transformer-bc5efe3a1596)).
+  
     
