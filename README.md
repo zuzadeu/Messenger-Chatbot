@@ -52,6 +52,8 @@ The project is compatibile with Python 3.4+ and Tensorflow 2.
   
   * 
 
-* I hope you like chatbot you built. If you are interested in details of how it works, please go to  the `transformer_chatbot.ipynb` notebook and to my [Medium artcile]([https://medium.com/@zuzannadeutschman/replicate-your-friend-with-transformer-bc5efe3a1596](https://medium.com/@zuzannadeutschman/replicate-your-friend-with-transformer-bc5efe3a1596)).
+* I hope you like chatbot you built. If you are interested in details of how it works, please go to  the `transformer_chatbot.ipynb` notebook and to my **Medium artcile**.
+  
+  https://medium.com/@zuzannadeutschman/replicate-your-friend-with-transformer-bc5efe3a1596](https://medium.com/@zuzannadeutschman/replicate-your-friend-with-transformer-bc5efe3a1596)).
   
     
