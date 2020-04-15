@@ -8,6 +8,8 @@ Created on Tue Apr  7 19:37:12 2020
 
 import pandas as pd
 import tensorflow as tf
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import pickle
 from train import textPreprocess
 from train import transformer
