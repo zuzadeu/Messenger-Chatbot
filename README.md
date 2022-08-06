@@ -10,11 +10,11 @@ MEDIUM ARTICLE: https://medium.com/@zuzannadeutschman/replicate-your-friend-with
 
 ## Features
 
-* Fast and reliable - similarly to google translator, it uses transformer model, implemented in tensorflow
+:sparkles: Fast and reliable - similarly to google translator, it uses transformer model, implemented in tensorflow
 
-* Each language compatibile - corpus is built based on sent messages. So, you input conversation may be in any language you want! For me, polish language works fantastic.
+:boom: Each language compatibile - corpus is built based on sent messages. So, you input conversation may be in any language you want! For me, polish language works fantastic.
 
-* Easy to run
+:dizzy: Easy to run
 
 ## Demo
 
