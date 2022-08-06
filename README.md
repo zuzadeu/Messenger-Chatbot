@@ -17,8 +17,7 @@ MEDIUM ARTICLE: https://medium.com/@zuzannadeutschman/replicate-your-friend-with
 :dizzy: Easy to run
 
 ## Demo
-
-![](C:\Users\zuzan\Pictures\chatbot.gif)
+![1_41CZzJCq9c9EaVVagt0kZg](https://user-images.githubusercontent.com/99670669/183236847-c8ddf39f-3195-4cc8-9aaf-e754fdc03610.gif)
 
 ## TODO
 
